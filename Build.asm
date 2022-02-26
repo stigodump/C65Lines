@@ -70,6 +70,8 @@ temp		.byte ?
 				;Set Bitplanes to first 128K
 				lda #%00000111
 				trb $d07c
+				lda #%00000010
+				tsb $d07c
 
 				lda #255
 				sta $d071
@@ -93,10 +95,10 @@ temp		.byte ?
 				
 				;Set two bitplanes to $8000 Bank0 & Bank1
 				;Set two bitplanes to $c000 Bank0 & Bank1
-				lda #%10001000
+				lda #%00000000
 				sta $d033
 				sta $d034
-				lda #%10001010
+				lda #%00100010
 				sta $d035
 				sta $d036
 				lda #%00001111
@@ -115,8 +117,9 @@ temp		.byte ?
 				;Setup Lines demo test routine
 				lda #$00
 				sta $d021
-				sta $d020
 				sta next
+				lda #02
+				sta $d020
 				jsr show_pallet
 
 				;set Base Page
@@ -199,8 +202,8 @@ dma_clrscrn	.byte %00000111 ;command low byte: FILL+CHAIN
 			.word 16383		;2 x 8192 screens
 			.word 0000		;source address/fill value
 			.byte 0			;source Bank
-			.word $8000		;destination address
-			.byte 1			;destination Bank
+			.word $0000		;destination address
+			.byte 5			;destination Bank
 			.byte 0			;command hi byte
 			.word 0			;modulo
 
@@ -208,8 +211,8 @@ dma_clrscrn	.byte %00000111 ;command low byte: FILL+CHAIN
 			.word 16383		;2 x 8192 screens
 			.word 0000		;source address/fill value
 			.byte 0			;source Bank
-			.word $8000		;destination address
-			.byte 0			;destination Bank
+			.word $0000		;destination address
+			.byte 4			;destination Bank
 			.byte 0			;command hi byte
 			.word 0			;modulo
 
@@ -237,6 +240,19 @@ next_col		ldx #8
 				inc temp
 				bbr 4,temp,next_col
 				rts
+
+show_pallet2	lda #$ff 
+				ldy #$00 
+				sty $8000
+				sty $c000
+				sta $8001
+				sty $c001
+				sty $8002
+				sta $c002
+				sta $8003
+				sta $c003
+				rts
+
 
 lineCol		.binclude "LineColour16.asm"
 lineBpln	.binclude "Line4Bitplane.asm"
