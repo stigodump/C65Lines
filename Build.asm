@@ -6,7 +6,7 @@
 ;	Discord: Stigodump
 ;	Date: 03/01/2022
 ;	Assembler: 64TAS Must be at least build 2625
-;	64tass-1.56.2625\64tass.exe -a Build.asm -o Build.prg --tab-size=4
+;	64tass-1.56.2625\64tass -a Build.asm -o Build.prg --tab-size=4
 ;	Xemu: Tested using Xemu - ROM 911001 & 920246
 ;
 ;******************************************************************
@@ -53,6 +53,12 @@ temp		.byte ?
 				map
 				eom
 
+				;C65 knock
+				;lda #$a5
+				;sta $d02f
+				;lda #$96
+				;sta $d02f
+
 				;Set DMAgic to F018B
 				lda #%00000001
 				tsb $d703
@@ -65,6 +71,9 @@ temp		.byte ?
 				lda #%00000111
 				trb $d07c
 
+				lda #255
+				sta $d071
+
 				;Save and update IRQ interrupt vector
 				sei
 				lda $314
@@ -76,7 +85,7 @@ temp		.byte ?
 				lda #>Int
 				sta $315
 
-				;Set raster compare to 251
+				;Set raster compare to 250
 				lda #%10000000
 				trb $d011
 				lda #<250
@@ -108,7 +117,7 @@ temp		.byte ?
 				sta $d021
 				sta $d020
 				sta next
-				;jsr show_Pallet
+				jsr show_pallet
 
 				;set Base Page
 				tba 
@@ -126,7 +135,8 @@ temp		.byte ?
 Wait			bra	Wait
 
 ;Interrupt entry point
-Int				lda #BASE_PAGE
+Int				;inc $d020
+				lda #BASE_PAGE
 				tab
 
 				dec timer
@@ -146,7 +156,18 @@ per_frame		lda #1
 				inc next 
 				inc next
 				
-int_exit		jmp $f9c3
+int_exit		lda #1
+				sta $d019
+				lda $a1
+				bit #$86
+				sta $d030
+				pla 
+				tab 
+				plz 
+				ply  
+				plx 
+				pla 
+				rti
 				
 next		.byte 0
 timer		.byte 5
@@ -192,7 +213,7 @@ dma_clrscrn	.byte %00000111 ;command low byte: FILL+CHAIN
 			.byte 0			;command hi byte
 			.word 0			;modulo
 
-show_Pallet		lda #0
+show_pallet		lda #0
 				sta temp
 				sta $d03c
 				sta $d03d

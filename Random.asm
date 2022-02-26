@@ -30,5 +30,5 @@ GetRND		lda CIAA_TALO
 			inc a
 			adc rndpntr+1
 			sta rndpntr+1
-rndpntr		lda $2d00,x
+rndpntr		lda movepoint.point_table,x
 			rts
